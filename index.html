@@ -1,21 +1,38 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Ear Trainer MVP1</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Allenamento Intervalli</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>🎵 Allenamento Intervalli</h1>
-    <select id="intervalSelect">
-      <option value="3">Terza</option>
-      <option value="5">Quinta</option>
-      <option value="7">Settima</option>
-      <option value="12">Ottava</option>
+  <header class="header">
+    <div class="logo">🎵 Allenamento</div>
+    <a href="quiz.html" class="menu-button">🎮 Quiz</a>
+  </header>
+
+  <main class="container">
+    <h1>Allenati sugli intervalli</h1>
+
+    <label>Nota di partenza:</label>
+    <select id="baseNoteSelect"></select>
+
+    <label>Intervallo:</label>
+    <select id="intervalSelect"></select>
+
+    <label>Direzione:</label>
+    <select id="directionSelect">
+      <option value="up">Ascendente</option>
+      <option value="down">Discendente</option>
     </select>
-    <button id="playButton">▶️ Riproduci Intervallo</button>
-  </div>
+
+    <button id="playButton">▶️ Riproduci</button>
+  </main>
+
+  <footer class="footer">
+    <span>Modalità Allenamento</span>
+  </footer>
 
   <script type="module" src="./js/main.js"></script>
 </body>

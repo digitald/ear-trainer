@@ -1,9 +1,46 @@
-import { SIMPLE_INTERVALS } from './intervals.js';
-import { playAscendingInterval } from './audio.js';
+import { NOTES, INTERVALS } from './intervals.js';
+import { playInterval } from './audio.js';
 
-document.getElementById('playButton').addEventListener('click', () => {
-  const select = document.getElementById('intervalSelect');
-  const interval = parseInt(select.value);
-  const baseFreq = 440; // A4
-  playAscendingInterval(baseFreq, interval);
+document.addEventListener('DOMContentLoaded', () => {
+  populateNoteSelect();
+  populateIntervalSelect();
+
+  document.getElementById('playButton').addEventListener('click', () => {
+    const noteIndex = parseInt(document.getElementById('baseNoteSelect').value);
+    const semitones = parseInt(document.getElementById('intervalSelect').value);
+    const direction = document.getElementById('directionSelect').value;
+
+    const baseNote = NOTES[noteIndex];
+    const interval = direction === 'down' ? -semitones : semitones;
+
+    const targetIndex = noteIndex + interval;
+    if (targetIndex < 0 || targetIndex >= NOTES.length) {
+      alert('Intervallo fuori scala!');
+      return;
+    }
+
+    const targetNote = NOTES[targetIndex];
+
+    playInterval(baseNote.freq, targetNote.freq);
+  });
 });
+
+function populateNoteSelect() {
+  const select = document.getElementById('baseNoteSelect');
+  NOTES.forEach((note, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = note.name;
+    select.appendChild(option);
+  });
+}
+
+function populateIntervalSelect() {
+  const select = document.getElementById('intervalSelect');
+  Object.entries(INTERVALS).forEach(([semitone, name]) => {
+    const option = document.createElement('option');
+    option.value = semitone;
+    option.textContent = name;
+    select.appendChild(option);
+  });
+}
