@@ -8,7 +8,7 @@ Una semplice app per allenare l'orecchio musicale sugli intervalli ascendenti.
 - Suoni generati con Web Audio API
 
 ## 🚀 Come provarlo
-Vai su: [https://tuo-username.github.io/ear-trainer/](https://tuo-username.github.io/ear-trainer/)
+Vai su: [https://digitald.github.io/ear-trainer/](https://digitald.github.io/ear-trainer/)
 
 Oppure clona e apri `index.html` con Live Server.
 
