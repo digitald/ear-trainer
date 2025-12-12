@@ -60,3 +60,72 @@ export const INTERVALS = {
   11: "Settima maggiore",
   12: "Ottava"
 };
+
+
+
+
+// NUOVO: Le melodie di riferimento
+// I numeri sono i semitoni rispetto alla nota base (0).
+// null indica una pausa.
+export const MELODIES = {
+  1: { // Seconda Minore
+    name: "Lo Squalo (Jaws)",
+    sequence: [0, 1, 0, 1, 0, 1], 
+    rhythm: 0.3 // Velocità
+  },
+  2: { // Seconda Maggiore
+    name: "Tanti Auguri",
+    sequence: [0, 0, 2, 0, 5, 4], // Tan-ti Au-gu-ri a...
+    rhythm: 0.4
+  },
+  3: { // Terza Minore
+    name: "Ninna Nanna (Brahms)",
+    sequence: [0, 0, 3, 0, 0, 3], // Nin-na nan-na...
+    rhythm: 0.5
+  },
+  4: { // Terza Maggiore
+    name: "Oh When The Saints",
+    sequence: [0, 4, 5, 7], // Oh when the saints...
+    rhythm: 0.4
+  },
+  5: { // Quarta Giusta
+    name: "Inno di Mameli / Harry Potter",
+    sequence: [0, 5, 0, 5, 0, 5], // Fratelli d'Italia... (pom-pom)
+    rhythm: 0.3
+  },
+  6: { // Tritono
+    name: "I Simpson",
+    sequence: [0, 6, 7], // The Simp-sons...
+    rhythm: 0.4
+  },
+  7: { // Quinta Giusta
+    name: "Star Wars / Twinkle Twinkle",
+    sequence: [0, 0, 7, 7, 9, 9, 7], // Twin-kle twin-kle lit-tle star
+    rhythm: 0.4
+  },
+  8: { // Sesta Minore
+    name: "The Entertainer / Love Story",
+    sequence: [0, 8, 3, 4, 5], 
+    rhythm: 0.25
+  },
+  9: { // Sesta Maggiore
+    name: "La Traviata (Libiamo)",
+    sequence: [0, 9, 5, 9, 12], // Li-bia-mo, ne'...
+    rhythm: 0.4
+  },
+  10: { // Settima Minore
+    name: "The Winner Takes It All (ABBA)",
+    sequence: [0, 10, 0, 10], 
+    rhythm: 0.5
+  },
+  11: { // Settima Maggiore
+    name: "Take On Me (A-ha)",
+    sequence: [0, 0, 7, 4, 11, 11], 
+    rhythm: 0.25
+  },
+  12: { // Ottava
+    name: "Somewhere Over The Rainbow",
+    sequence: [0, 12, 11, 7], // Some-where o-ver...
+    rhythm: 0.6
+  }
+};

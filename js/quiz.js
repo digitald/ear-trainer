@@ -1,5 +1,5 @@
-import { NOTES, INTERVALS } from './intervals.js'; 
-import { playInterval } from './audio.js';
+import { NOTES, INTERVALS, MELODIES } from './intervals.js'; 
+import { playInterval, playMelody } from './audio.js';
 
 // Configurazioni partita
 const TOTAL_QUESTIONS = 10;
@@ -18,16 +18,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const replayArea = document.getElementById('replayArea');
   const answerButtons = document.getElementById('answerButtons');
   
-  // 1. Setup Bottone Riascolta
+  // --- CONTROLLI UTENTE ---
+  const controlsDiv = document.createElement('div');
+  controlsDiv.style.display = 'flex';
+  controlsDiv.style.justifyContent = 'center';
+  controlsDiv.style.gap = '15px';
+
+  // 1. Bottone Riascolta (Intervallo)
   const replayBtn = document.createElement('button');
-  replayBtn.innerHTML = '🔊'; 
+  replayBtn.innerHTML = '🔊'; // Icona speaker
   replayBtn.className = 'replay-btn';
   replayBtn.onclick = () => {
     if(!isWaiting) playInterval(currentBaseFreq, currentTargetFreq);
   };
-  replayArea.appendChild(replayBtn);
+  
+  // 2. Bottone Suggerimento (Melodia)
+  const hintBtn = document.createElement('button');
+  hintBtn.innerHTML = '💡'; // Lampadina
+  hintBtn.className = 'replay-btn';
+  hintBtn.style.backgroundColor = '#8b5cf6'; // Viola
+  hintBtn.onclick = () => {
+    if(!isWaiting) playHintMelody();
+  };
 
-  // 2. Setup Griglia Risposte
+  controlsDiv.appendChild(replayBtn);
+  controlsDiv.appendChild(hintBtn);
+  replayArea.appendChild(controlsDiv);
+
+  // --- BOTTONI RISPOSTA ---
   Object.entries(INTERVALS).forEach(([semitones, name]) => {
     const btn = document.createElement('button');
     btn.className = 'answer-btn';
@@ -41,17 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
     answerButtons.appendChild(btn);
   });
 
-  // 3. Event Listeners
+  // --- START ---
   startBtn.addEventListener('click', startGame);
   restartBtn.addEventListener('click', startGame);
 });
 
 function startGame() {
-    // Reset variabili
     score = 0;
     questionCount = 0;
     
-    // Gestione UI (Nascondi start/risultati, mostra gioco)
     document.getElementById('startScreen').classList.add('hidden');
     document.getElementById('resultScreen').classList.add('hidden');
     document.getElementById('gameUI').classList.remove('hidden');
@@ -65,46 +81,60 @@ function startNewRound() {
   clearFeedback();
   resetButtonStyles();
 
-  // Fine partita?
   if (questionCount >= TOTAL_QUESTIONS) {
       endGame();
       return;
   }
 
-  // 1. Scegli Intervallo
+  // Scegli Intervallo
   const intervalKeys = Object.keys(INTERVALS);
   currentInterval = parseInt(intervalKeys[Math.floor(Math.random() * intervalKeys.length)]);
 
-  // 2. Scegli Direzione (0 = Ascendente, 1 = Discendente)
+  // Scegli Direzione
   const isDescending = Math.random() > 0.5;
 
   let noteIndex1, noteIndex2;
 
   if (!isDescending) {
-      // ASCENDENTE (Nota bassa -> Nota alta)
-      // La partenza deve essere tale che: start + interval < lunghezza array
+      // ASCENDENTE
       const maxStart = NOTES.length - currentInterval - 1;
       noteIndex1 = Math.floor(Math.random() * (maxStart + 1));
       noteIndex2 = noteIndex1 + currentInterval;
-      
-      // Feedback visivo opzionale in console
-      console.log(`Ascendente: ${NOTES[noteIndex1].name} -> ${NOTES[noteIndex2].name}`);
   } else {
-      // DISCENDENTE (Nota alta -> Nota bassa)
-      // La partenza deve essere almeno grande quanto l'intervallo
+      // DISCENDENTE
       const minStart = currentInterval; 
       noteIndex1 = Math.floor(Math.random() * (NOTES.length - minStart)) + minStart;
       noteIndex2 = noteIndex1 - currentInterval;
-
-      console.log(`Discendente: ${NOTES[noteIndex1].name} -> ${NOTES[noteIndex2].name}`);
   }
 
-  // Imposta frequenze globali
   currentBaseFreq = NOTES[noteIndex1].freq;
   currentTargetFreq = NOTES[noteIndex2].freq;
 
-  // Riproduci
   playInterval(currentBaseFreq, currentTargetFreq);
+}
+
+function playHintMelody() {
+    const melodyData = MELODIES[currentInterval];
+    if (melodyData) {
+        const feedback = document.getElementById('feedback');
+        const oldText = feedback.textContent;
+        
+        // Feedback visuale temporaneo
+        feedback.textContent = `🎵 ${melodyData.name}`;
+        feedback.style.color = '#8b5cf6';
+        
+        // Suona la melodia (sempre ascendente per mnemonica, partendo dalla nota più bassa dell'intervallo corrente)
+        // Se l'intervallo è discendente, usiamo la nota di arrivo come base della melodia, oppure quella di partenza.
+        // Per semplicità didattica, usiamo la currentBaseFreq (la prima nota sentita).
+        playMelody(currentBaseFreq, melodyData.sequence, melodyData.rhythm);
+
+        setTimeout(() => {
+            if(!isWaiting) {
+                feedback.textContent = oldText;
+                feedback.style.color = 'inherit';
+            }
+        }, 2000);
+    }
 }
 
 function handleAnswer(userGuess, btnElement) {
@@ -126,7 +156,6 @@ function handleAnswer(userGuess, btnElement) {
   questionCount++;
   updateStatsUI();
 
-  // Pausa ridotta a 1.2s per ritmo più incalzante
   setTimeout(() => {
     startNewRound();
   }, 1200);
@@ -142,7 +171,7 @@ function endGame() {
     const msgElement = document.getElementById('finalMessage');
     if (score === 10) msgElement.textContent = "🏆 Orecchio Assoluto!";
     else if (score >= 8) msgElement.textContent = "🎵 Ottimo musicista!";
-    else if (score >= 5) msgElement.textContent = "👍 Buona base, continua così.";
+    else if (score >= 5) msgElement.textContent = "👍 Buona base.";
     else msgElement.textContent = "👂 Serve più allenamento!";
 }
 
@@ -151,7 +180,6 @@ function updateStatsUI() {
     document.getElementById('scoreText').textContent = `Punti: ${score}`;
 }
 
-// Helpers
 function simplifyName(name) {
     return name
         .replace("minore", "min")
