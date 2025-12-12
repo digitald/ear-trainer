@@ -8,22 +8,29 @@
 </head>
 <body>
   <header class="header">
-    <div class="logo">🎮 Quiz Intervalli</div>
+    <div class="logo">🎮 Quiz</div>
     <a href="index.html" class="menu-button">🎧 Allenamento</a>
   </header>
 
-  <main class="container">
-    <h1>Riconosci l'intervallo</h1>
-    <button id="startQuizBtn">🎯 Inizia Quiz</button>
-    <div id="quizArea" class="hidden">
-      <p>Ascolta e seleziona l'intervallo:</p>
-      <div id="answerButtons"></div>
-      <div id="feedback" class="feedback"></div>
+  <main class="container quiz-container">
+    
+    <div class="quiz-controls">
+        <button id="startQuizBtn" class="primary-action-btn">🎯 Inizia Quiz</button>
+        
+        <div id="replayArea"></div> 
+        
+        <div id="feedback" class="feedback"></div>
     </div>
+
+    <div id="quizArea" class="hidden">
+      <p class="instruction-text">Seleziona l'intervallo:</p>
+      <div id="answerButtons" class="grid-buttons"></div>
+    </div>
+
   </main>
 
   <footer class="footer">
-    <span>Modalità Quiz</span>
+    <span>Ear Trainer v1.0</span>
   </footer>
 
   <script type="module" src="./js/quiz.js"></script>
