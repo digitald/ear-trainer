@@ -31,6 +31,10 @@ function populateNoteSelect() {
     const option = document.createElement('option');
     option.value = index;
     option.textContent = note.name;
+    
+    // AGGIUNTA: Se è Do3 (o Do4), selezionalo di default
+    if (note.name === 'Do3') option.selected = true; 
+
     select.appendChild(option);
   });
 }
