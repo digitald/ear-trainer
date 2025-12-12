@@ -6,7 +6,7 @@
 }
 
 html, body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: #f9fafb;
   color: #1f2937;
   height: 100%;
@@ -35,18 +35,25 @@ html, body {
 }
 
 .menu-button {
-  font-size: 1.4rem;
+  font-size: 1rem;
   color: white;
   text-decoration: none;
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-button:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Main container */
 .container {
-  margin-top: 80px;
-  margin-bottom: 80px;
+  margin-top: 80px; /* Spazio per l'header */
+  margin-bottom: 80px; /* Spazio per il footer */
   padding: 2rem 1rem;
   max-width: 480px;
   margin-inline: auto;
@@ -59,42 +66,50 @@ h1 {
   font-size: 1.6rem;
   margin-bottom: 1.5rem;
   text-align: center;
-}
-
-/* Blocks */
-.block {
-  margin-bottom: 1.5rem;
-}
-
-label {
-  display: block;
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
+  color: #111827;
 }
 
 /* Form elements */
+label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  color: #374151;
+}
+
 select,
 button,
 .answer-btn {
   width: 100%;
   padding: 1rem;
   font-size: 1.1rem;
-  border-radius: 16px;
-  border: none;
-  margin-top: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-top: 0.25rem;
   cursor: pointer;
 }
 
 select {
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
+  color: #334155;
 }
 
+/* Pulsanti Primari */
 button,
 .answer-btn {
   background-color: #3b82f6;
   color: white;
-  transition: background-color 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: none;
+  transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+  font-weight: 600;
+}
+
+button:active,
+.answer-btn:active {
+  transform: scale(0.98);
 }
 
 button:hover,
@@ -102,12 +117,26 @@ button:hover,
   background-color: #2563eb;
 }
 
+/* Pulsante Riascolta (Speciale) */
+.replay-btn {
+    background-color: #f59e0b !important; /* Arancione */
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2) !important;
+}
+.replay-btn:hover {
+    background-color: #d97706 !important;
+}
+
 /* Quiz buttons layout */
 #answerButtons {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.75rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(2, 1fr); /* 2 colonne fisse */
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
 }
 
 /* Feedback */
@@ -115,7 +144,8 @@ button:hover,
   margin-top: 1.5rem;
   text-align: center;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  min-height: 2rem; /* Evita salti di layout */
 }
 
 /* Footer */
@@ -123,4 +153,11 @@ button:hover,
   position: fixed;
   bottom: 0;
   left: 0;
+  right: 0;
+  background-color: #f3f4f6;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+  border-top: 1px solid #e5e7eb;
 }
