@@ -13,7 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pulisci il testo della melodia per non confondere
     document.getElementById('melodyName').textContent = "";
     
-    playInterval(baseNote.freq, targetNote.freq);
+    // Recupera gli indici
+const noteIndex = parseInt(document.getElementById('baseNoteSelect').value);
+const semitones = parseInt(document.getElementById('intervalSelect').value);
+// ... calcoli ...
+// playInterval vuole (indicePartenza, indiceArrivo)
+playInterval(noteIndex, targetIndex);
   });
 
   // Tasto Suggerimento (Nuovo)
@@ -27,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (melody) {
       document.getElementById('melodyName').textContent = `🎵 ${melody.name}`;
       // Suoniamo la melodia usando la nota di partenza selezionata
-      playMelody(baseNote.freq, melody.sequence, melody.rhythm);
+      playMelody(noteIndex, melody.sequence, melody.rhythm);
     } else {
       document.getElementById('melodyName').textContent = "Nessuna melodia per questo intervallo";
     }

@@ -1,16 +1,16 @@
 import { NOTES, INTERVALS, MELODIES } from './intervals.js'; 
 import { playInterval, playMelody } from './audio.js';
 
-// Configurazioni partita
+// --- CONFIGURAZIONE ---
 const TOTAL_QUESTIONS = 10;
 
-// Stato del gioco
-let currentInterval = null;
-let currentBaseFreq = 0;
-let currentTargetFreq = 0;
+// --- STATO DEL GIOCO ---
+let currentInterval = null; // Il numero di semitoni (la risposta giusta)
+let currentBaseIndex = 0;   // Indice della prima nota nell'array NOTES
+let currentTargetIndex = 0; // Indice della seconda nota
 let score = 0;
 let questionCount = 0;
-let isWaiting = false;
+let isWaiting = false;      // Per bloccare i click mentre suona/attende
 
 document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('startQuizBtn');
@@ -18,23 +18,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const replayArea = document.getElementById('replayArea');
   const answerButtons = document.getElementById('answerButtons');
   
-  // --- CONTROLLI UTENTE ---
+  // --- CREAZIONE CONTROLLI (Riascolta + Aiuto) ---
   const controlsDiv = document.createElement('div');
   controlsDiv.style.display = 'flex';
   controlsDiv.style.justifyContent = 'center';
   controlsDiv.style.gap = '15px';
+  controlsDiv.style.marginBottom = '15px';
 
-  // 1. Bottone Riascolta (Intervallo)
+  // 1. Bottone Riascolta (Speaker)
   const replayBtn = document.createElement('button');
-  replayBtn.innerHTML = '🔊'; // Icona speaker
+  replayBtn.innerHTML = '🔊'; 
   replayBtn.className = 'replay-btn';
   replayBtn.onclick = () => {
-    if(!isWaiting) playInterval(currentBaseFreq, currentTargetFreq);
+    // Risuona l'intervallo corrente usando gli indici salvati
+    if(!isWaiting) playInterval(currentBaseIndex, currentTargetIndex);
   };
   
-  // 2. Bottone Suggerimento (Melodia)
+  // 2. Bottone Suggerimento (Lampadina)
   const hintBtn = document.createElement('button');
-  hintBtn.innerHTML = '💡'; // Lampadina
+  hintBtn.innerHTML = '💡'; 
   hintBtn.className = 'replay-btn';
   hintBtn.style.backgroundColor = '#8b5cf6'; // Viola
   hintBtn.onclick = () => {
@@ -45,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   controlsDiv.appendChild(hintBtn);
   replayArea.appendChild(controlsDiv);
 
-  // --- BOTTONI RISPOSTA ---
+  // --- CREAZIONE BOTTONI RISPOSTA ---
   Object.entries(INTERVALS).forEach(([semitones, name]) => {
     const btn = document.createElement('button');
     btn.className = 'answer-btn';
@@ -59,15 +61,18 @@ document.addEventListener('DOMContentLoaded', () => {
     answerButtons.appendChild(btn);
   });
 
-  // --- START ---
+  // --- EVENT LISTENERS START/RESTART ---
   startBtn.addEventListener('click', startGame);
   restartBtn.addEventListener('click', startGame);
 });
+
+// --- LOGICA DI GIOCO ---
 
 function startGame() {
     score = 0;
     questionCount = 0;
     
+    // Gestione visualizzazione schermate
     document.getElementById('startScreen').classList.add('hidden');
     document.getElementById('resultScreen').classList.add('hidden');
     document.getElementById('gameUI').classList.remove('hidden');
@@ -81,36 +86,34 @@ function startNewRound() {
   clearFeedback();
   resetButtonStyles();
 
+  // Controllo fine partita
   if (questionCount >= TOTAL_QUESTIONS) {
       endGame();
       return;
   }
 
-  // Scegli Intervallo
+  // 1. Scegli Intervallo casuale
   const intervalKeys = Object.keys(INTERVALS);
   currentInterval = parseInt(intervalKeys[Math.floor(Math.random() * intervalKeys.length)]);
 
-  // Scegli Direzione
+  // 2. Scegli Direzione (Ascendente o Discendente)
   const isDescending = Math.random() > 0.5;
 
-  let noteIndex1, noteIndex2;
-
+  // 3. Calcola gli indici delle note (Math)
   if (!isDescending) {
-      // ASCENDENTE
+      // ASCENDENTE: Start basso -> Target alto
       const maxStart = NOTES.length - currentInterval - 1;
-      noteIndex1 = Math.floor(Math.random() * (maxStart + 1));
-      noteIndex2 = noteIndex1 + currentInterval;
+      currentBaseIndex = Math.floor(Math.random() * (maxStart + 1));
+      currentTargetIndex = currentBaseIndex + currentInterval;
   } else {
-      // DISCENDENTE
+      // DISCENDENTE: Start alto -> Target basso
       const minStart = currentInterval; 
-      noteIndex1 = Math.floor(Math.random() * (NOTES.length - minStart)) + minStart;
-      noteIndex2 = noteIndex1 - currentInterval;
+      currentBaseIndex = Math.floor(Math.random() * (NOTES.length - minStart)) + minStart;
+      currentTargetIndex = currentBaseIndex - currentInterval;
   }
 
-  currentBaseFreq = NOTES[noteIndex1].freq;
-  currentTargetFreq = NOTES[noteIndex2].freq;
-
-  playInterval(currentBaseFreq, currentTargetFreq);
+  // 4. Riproduci (Passando gli INDICI, non le frequenze)
+  playInterval(currentBaseIndex, currentTargetIndex);
 }
 
 function playHintMelody() {
@@ -123,30 +126,36 @@ function playHintMelody() {
         feedback.textContent = `🎵 ${melodyData.name}`;
         feedback.style.color = '#8b5cf6';
         
-        // Suona la melodia (sempre ascendente per mnemonica, partendo dalla nota più bassa dell'intervallo corrente)
-        // Se l'intervallo è discendente, usiamo la nota di arrivo come base della melodia, oppure quella di partenza.
-        // Per semplicità didattica, usiamo la currentBaseFreq (la prima nota sentita).
-        playMelody(currentBaseFreq, melodyData.sequence, melodyData.rhythm);
+        // Suona la melodia usando la nota base corrente come riferimento
+        playMelody(currentBaseIndex, melodyData.sequence, melodyData.rhythm);
 
+        // Ripristina il testo dopo 2.5 secondi
         setTimeout(() => {
             if(!isWaiting) {
                 feedback.textContent = oldText;
                 feedback.style.color = 'inherit';
             }
-        }, 2000);
+        }, 2500);
+    } else {
+        // Fallback per l'unisono o se manca la melodia
+        const feedback = document.getElementById('feedback');
+        feedback.textContent = "Nessun suggerimento disponibile";
+        setTimeout(() => feedback.textContent = "Ascolta...", 1000);
     }
 }
 
 function handleAnswer(userGuess, btnElement) {
   const feedback = document.getElementById('feedback');
-  isWaiting = true; 
+  isWaiting = true; // Blocca input
 
   if (userGuess === currentInterval) {
+    // Risposta Corretta
     feedback.textContent = '✅ Corretto!';
     feedback.className = 'feedback success';
     btnElement.classList.add('correct');
     score++;
   } else {
+    // Risposta Sbagliata
     const correctName = INTERVALS[currentInterval];
     feedback.textContent = `❌ Era: ${correctName}`;
     feedback.className = 'feedback error';
@@ -156,9 +165,10 @@ function handleAnswer(userGuess, btnElement) {
   questionCount++;
   updateStatsUI();
 
+  // Pausa prima del prossimo round
   setTimeout(() => {
     startNewRound();
-  }, 1200);
+  }, 1500);
 }
 
 function endGame() {
@@ -179,6 +189,8 @@ function updateStatsUI() {
     document.getElementById('progressText').textContent = `Domanda ${Math.min(questionCount + 1, TOTAL_QUESTIONS)}/${TOTAL_QUESTIONS}`;
     document.getElementById('scoreText').textContent = `Punti: ${score}`;
 }
+
+// --- HELPERS ---
 
 function simplifyName(name) {
     return name
