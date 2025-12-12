@@ -8,29 +8,45 @@
 </head>
 <body>
   <header class="header">
-    <div class="logo">🎮 Quiz</div>
+    <div class="logo">🎮 Quiz a Punti</div>
     <a href="index.html" class="menu-button">🎧 Allenamento</a>
   </header>
 
   <main class="container quiz-container">
     
-    <div class="quiz-controls">
-        <button id="startQuizBtn" class="primary-action-btn">🎯 Inizia Quiz</button>
-        
-        <div id="replayArea"></div> 
-        
-        <div id="feedback" class="feedback"></div>
+    <div id="startScreen" class="quiz-controls">
+        <h1>Sei pronto?</h1>
+        <p class="instruction-text">10 Domande. Intervalli ascendenti e discendenti.</p>
+        <button id="startQuizBtn" class="primary-action-btn">🎯 Inizia Partita</button>
     </div>
 
-    <div id="quizArea" class="hidden">
-      <p class="instruction-text">Seleziona l'intervallo:</p>
-      <div id="answerButtons" class="grid-buttons"></div>
+    <div id="gameUI" class="hidden">
+        <div class="stats-bar">
+            <span id="progressText">Domanda 1/10</span>
+            <span id="scoreText">Punti: 0</span>
+        </div>
+
+        <div class="quiz-controls">
+            <div id="replayArea"></div> 
+            <div id="feedback" class="feedback">Ascolta...</div>
+        </div>
+
+        <div id="quizArea">
+            <div id="answerButtons" class="grid-buttons"></div>
+        </div>
+    </div>
+
+    <div id="resultScreen" class="hidden result-card">
+        <h2>Partita Finita!</h2>
+        <div class="final-score" id="finalScoreDisplay">8/10</div>
+        <p id="finalMessage">Ottimo lavoro!</p>
+        <button id="restartBtn" class="primary-action-btn">🔄 Rigioca</button>
     </div>
 
   </main>
 
   <footer class="footer">
-    <span>Ear Trainer v1.0</span>
+    <span>Ear Trainer v1.1</span>
   </footer>
 
   <script type="module" src="./js/quiz.js"></script>
