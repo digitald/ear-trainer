@@ -1,95 +1,111 @@
-// Controlla il nome del file: interval.js o intervals.js?
 import { NOTES, INTERVALS } from './intervals.js'; 
 import { playInterval } from './audio.js';
 
 let currentInterval = null;
-// Salviamo le frequenze correnti per poterle riascoltare
 let currentBaseFreq = 0;
 let currentTargetFreq = 0;
-// Un flag per evitare che l'utente clicchi mentre aspetta il prossimo round
-let isWaiting = false;
+let isWaiting = false; // Blocca click durante l'attesa
 
 document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('startQuizBtn');
   const quizArea = document.getElementById('quizArea');
+  const replayArea = document.getElementById('replayArea');
   const answerButtons = document.getElementById('answerButtons');
   
-  // Creiamo un pulsante "Riascolta" dinamicamente
+  // 1. Creiamo il pulsante Riascolta (icona grossa)
   const replayBtn = document.createElement('button');
-  replayBtn.textContent = '🔄 Riascolta';
-  replayBtn.className = 'replay-btn'; // Aggiungi stile in CSS se vuoi
-  replayBtn.style.marginTop = "20px";
+  replayBtn.innerHTML = '🔊'; // Icona speaker
+  replayBtn.className = 'replay-btn hidden'; // Nascosto all'inizio
   replayBtn.onclick = () => {
     if(!isWaiting) playInterval(currentBaseFreq, currentTargetFreq);
   };
-  // Lo inseriamo prima dei bottoni di risposta
-  quizArea.insertBefore(replayBtn, answerButtons);
+  replayArea.appendChild(replayBtn);
 
-  // Costruisci bottoni delle risposte
+  // 2. Creiamo la griglia dei bottoni risposta
   Object.entries(INTERVALS).forEach(([semitones, name]) => {
     const btn = document.createElement('button');
     btn.className = 'answer-btn';
-    btn.textContent = name;
+    // Abbrevi nomi lunghi per farli stare nella griglia (opzionale)
+    // Es: "Seconda maggiore" -> "2ª Magg"
+    btn.textContent = simplifyName(name); 
     btn.dataset.value = semitones;
 
-    btn.addEventListener('click', () => {
-      if (isWaiting) return; // Blocca click multipli
-      const userGuess = parseInt(btn.dataset.value);
-      handleAnswer(userGuess);
+    btn.addEventListener('click', (e) => {
+      if (isWaiting) return; 
+      handleAnswer(parseInt(btn.dataset.value), e.target);
     });
 
     answerButtons.appendChild(btn);
   });
 
+  // 3. Start
   startBtn.addEventListener('click', () => {
     startBtn.classList.add('hidden');
     quizArea.classList.remove('hidden');
+    replayBtn.classList.remove('hidden');
     startNewRound();
   });
 });
 
+// Funzione per accorciare i nomi nella griglia (più pulito su mobile)
+function simplifyName(name) {
+    return name
+        .replace("minore", "min")
+        .replace("maggiore", "Mag")
+        .replace("giusta", "G")
+        .replace("aumentata", "Aum")
+        .replace("diminuita", "Dim");
+}
+
 function startNewRound() {
   isWaiting = false;
   clearFeedback();
+  resetButtonStyles();
 
-  // Genera intervallo casuale (escludendo l'Unisono se vuoi renderlo più difficile, altrimenti va bene così)
+  // Genera intervallo e note (Logica esistente)
   const intervalKeys = Object.keys(INTERVALS);
-  // Nota: intervalKeys sono stringhe "0", "1", ecc.
   currentInterval = parseInt(intervalKeys[Math.floor(Math.random() * intervalKeys.length)]);
-
-  // Scegli nota di partenza
-  // maxStart assicura che (start + interval) non superi l'ultima nota
   const maxStart = NOTES.length - currentInterval - 1;
   const currentNoteIndex = Math.floor(Math.random() * (maxStart + 1));
 
-  // Salviamo le frequenze nelle variabili globali
   currentBaseFreq = NOTES[currentNoteIndex].freq;
   currentTargetFreq = NOTES[currentNoteIndex + currentInterval].freq;
 
-  // Riproduci
   playInterval(currentBaseFreq, currentTargetFreq);
 }
 
-function handleAnswer(userGuess) {
+function handleAnswer(userGuess, btnElement) {
   const feedback = document.getElementById('feedback');
-  isWaiting = true; // Blocca l'input dell'utente
+  isWaiting = true; // Blocca input
 
   if (userGuess === currentInterval) {
+    // Risposta Esatta
     feedback.textContent = '✅ Corretto!';
-    feedback.style.color = 'green';
+    feedback.className = 'feedback success';
+    btnElement.classList.add('correct'); // Colora bottone di verde
   } else {
+    // Risposta Sbagliata
     const correctName = INTERVALS[currentInterval];
-    feedback.textContent = `❌ Sbagliato! Era una ${correctName}`;
-    feedback.style.color = 'red';
+    feedback.textContent = `❌ Era: ${correctName}`;
+    feedback.className = 'feedback error';
+    btnElement.classList.add('wrong'); // Colora bottone di rosso
   }
 
-  // Aspetta 2 secondi e poi ricomincia
+  // Aspetta 1.5 secondi e poi prossimo round
   setTimeout(() => {
     startNewRound();
-  }, 2500);
+  }, 1500);
 }
 
 function clearFeedback() {
   const feedback = document.getElementById('feedback');
-  feedback.textContent = '';
+  feedback.textContent = 'Ascolta...'; // Testo neutro
+  feedback.className = 'feedback';
+}
+
+function resetButtonStyles() {
+    const btns = document.querySelectorAll('.answer-btn');
+    btns.forEach(btn => {
+        btn.classList.remove('correct', 'wrong');
+    });
 }
