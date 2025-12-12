@@ -1,51 +1,58 @@
-// Creiamo una variabile per il contesto audio, ma non lo inizializziamo subito
-// per rispettare le policy di autoplay dei browser.
 let audioCtx = null;
 
 export function playInterval(freq1, freq2) {
-  // 1. Inizializzazione Singleton: Creiamo il contesto solo se non esiste
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  
-  // 2. Resume: Se il contesto è sospeso (succede spesso su Chrome), lo riattiviamo
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
 
   const now = audioCtx.currentTime;
-  
-  // Durata di ogni nota in secondi
-  const noteDuration = 0.8; 
+  // Aumentiamo leggermente la durata totale della nota
+  const noteDuration = 1.0; 
 
   playNote(freq1, now, noteDuration);
   playNote(freq2, now + noteDuration, noteDuration);
 }
 
-// Funzione helper per suonare una singola nota ed evitare ripetizioni di codice
 function playNote(freq, startTime, duration) {
   const osc = audioCtx.createOscillator();
   const gainNode = audioCtx.createGain();
 
+  // 'triangle' è morbido ma chiaro.
+  // Se vuoi un suono più "retro game", prova 'square' (ma abbassa il volume a 0.1)
   osc.type = 'triangle'; 
   osc.frequency.value = freq;
 
-  // Connessioni: Oscillatore -> Gain -> Casse
   osc.connect(gainNode);
   gainNode.connect(audioCtx.destination);
 
-  // Gestione Volume (Envelope) per evitare il "click"
-  gainNode.gain.setValueAtTime(0, startTime); // Inizia muto
-  gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.05); // Fade-in veloce
-  gainNode.gain.setValueAtTime(0.2, startTime + duration - 0.05); // Mantiene volume
-  gainNode.gain.linearRampToValueAtTime(0, startTime + duration); // Fade-out finale
+  // --- ENVELOPE (Busta sonora) MIGLIORATO ---
+  
+  // 1. Attacco immediato ma non "cliccante"
+  gainNode.gain.setValueAtTime(0, startTime);
+  gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.05); // Volume 0.3 (più alto)
+
+  // 2. Sustain (Mantenimento)
+  // Manteniamo il volume fino a poco prima della fine
+  const releaseStart = startTime + duration - 0.2; // Inizia a sfumare 0.2s prima della fine
+  gainNode.gain.setValueAtTime(0.3, releaseStart);
+
+  // 3. Release (Rilascio morbido)
+  // Usiamo esponenziale per naturalezza. Scendiamo a 0.001 (quasi zero)
+  // Nota: exponentialRamp non può andare a 0 assoluto, quindi usiamo un valore piccolissimo.
+  gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+  
+  // Chiudiamo a zero assoluto alla fine per sicurezza
+  gainNode.gain.linearRampToValueAtTime(0, startTime + duration + 0.05);
 
   osc.start(startTime);
-  osc.stop(startTime + duration);
+  // Fermiamo l'oscillatore POCO DOPO la fine della sfumatura per evitare il "POP"
+  osc.stop(startTime + duration + 0.1);
   
-  // Pulizia: scollega i nodi dopo che hanno suonato per liberare memoria
   setTimeout(() => {
     osc.disconnect();
     gainNode.disconnect();
-  }, (duration * 1000) + 100);
+  }, (duration * 1000) + 200);
 }
