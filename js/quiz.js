@@ -1,5 +1,5 @@
 // Controlla il nome del file: interval.js o intervals.js?
-import { NOTES, INTERVALS } from './interval.js'; 
+import { NOTES, INTERVALS } from './intervals.js'; 
 import { playInterval } from './audio.js';
 
 let currentInterval = null;
