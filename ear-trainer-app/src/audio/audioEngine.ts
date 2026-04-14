@@ -128,3 +128,29 @@ export function playMelody(baseIndex: number, sequence: number[], speed = 0.35):
     playNoteByIndex(targetIndex, now + idx * speed, Math.max(0.22, speed * 0.9))
   })
 }
+
+export function playSingleNote(noteIndex: number, duration = 0.4): void {
+  if (!NOTES[noteIndex]) return
+  initAudioEngine()
+  const ctx = ensureContext()
+  playNoteByIndex(noteIndex, ctx.currentTime, duration)
+}
+
+export function playPercussionClick(strong = false): void {
+  const ctx = ensureContext()
+  const now = ctx.currentTime
+  const oscillator = ctx.createOscillator()
+  const gainNode = ctx.createGain()
+
+  oscillator.type = 'square'
+  oscillator.frequency.value = strong ? 1400 : 1000
+  oscillator.connect(gainNode)
+  gainNode.connect(ctx.destination)
+
+  gainNode.gain.setValueAtTime(0, now)
+  gainNode.gain.linearRampToValueAtTime(strong ? 0.24 : 0.16, now + 0.003)
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.05)
+
+  oscillator.start(now)
+  oscillator.stop(now + 0.055)
+}

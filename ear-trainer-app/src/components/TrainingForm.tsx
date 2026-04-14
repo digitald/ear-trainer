@@ -40,35 +40,49 @@ export function TrainingForm(props: TrainingFormProps) {
 
   return (
     <section className="card">
-      <label>
-        {directionLabel}
-        <select value={direction} onChange={(e) => onDirectionChange(e.target.value as 'up' | 'down')}>
-          <option value="up">{ascendingLabel}</option>
-          <option value="down">{descendingLabel}</option>
-        </select>
-      </label>
+      <div className="picker-group">
+        <p className="picker-label">{directionLabel}</p>
+        <div className="picker-row">
+          <button type="button" className={direction === 'up' ? '' : 'secondary'} onClick={() => onDirectionChange('up')}>
+            {ascendingLabel}
+          </button>
+          <button type="button" className={direction === 'down' ? '' : 'secondary'} onClick={() => onDirectionChange('down')}>
+            {descendingLabel}
+          </button>
+        </div>
+      </div>
 
-      <label>
-        {baseNoteLabel}
-        <select value={baseIndex} onChange={(e) => onBaseIndexChange(Number(e.target.value))}>
+      <div className="picker-group">
+        <p className="picker-label">{baseNoteLabel}</p>
+        <div className="picker-scroll" role="listbox" aria-label={baseNoteLabel}>
           {notes.map((note, index) => (
-            <option key={note.name + index} value={index}>
+            <button
+              key={note.name + index}
+              type="button"
+              className={`chip${baseIndex === index ? ' chip-active' : ''}`}
+              onClick={() => onBaseIndexChange(index)}
+            >
               {note.name}
-            </option>
+            </button>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
 
-      <label>
-        {intervalLabel}
-        <select value={semitones} onChange={(e) => onSemitonesChange(Number(e.target.value))}>
+      <div className="picker-group">
+        <p className="picker-label">{intervalLabel}</p>
+        <div className="picker-scroll" role="listbox" aria-label={intervalLabel}>
           {intervals.map((interval) => (
-            <option key={interval.semitone} value={interval.semitone}>
+            <button
+              key={interval.semitone}
+              type="button"
+              className={`chip${semitones === interval.semitone ? ' chip-active' : ''}`}
+              onClick={() => onSemitonesChange(interval.semitone)}
+            >
               {interval.label}
-            </option>
+            </button>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
     </section>
   )
 }

@@ -6,12 +6,16 @@ type LanguageSwitcherProps = {
 
 export function LanguageSwitcher({ value, label, onChange }: LanguageSwitcherProps) {
   return (
-    <label className="lang-select">
-      {label}
-      <select value={value} onChange={(e) => onChange(e.target.value as 'it' | 'en')}>
-        <option value="it">IT</option>
-        <option value="en">EN</option>
-      </select>
-    </label>
+    <div className="lang-select">
+      <span>{label}</span>
+      <div className="picker-row">
+        <button type="button" className={value === 'it' ? '' : 'secondary'} onClick={() => onChange('it')}>
+          IT
+        </button>
+        <button type="button" className={value === 'en' ? '' : 'secondary'} onClick={() => onChange('en')}>
+          EN
+        </button>
+      </div>
+    </div>
   )
 }
