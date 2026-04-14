@@ -1,21 +1,26 @@
-# 🎵 Ear Trainer – MVP1
+# Ear Trainer
 
-Una semplice app per allenare l'orecchio musicale sugli intervalli ascendenti.
+Repository con:
+- versione legacy web (`index.html`, `quiz.html`, cartella `js/`)
+- nuova app in migrazione `React + TypeScript + Vite + Capacitor` in `ear-trainer-app/`
 
-## ✅ Funzionalità attuali
-- UI minimale
-- Generazione intervalli ascendenti (3a, 5a, 7a, 8a)
-- Suoni generati con Web Audio API
+## Legacy
+Versione originale disponibile su GitHub Pages:
+[https://digitald.github.io/ear-trainer/](https://digitald.github.io/ear-trainer/)
 
-## 🚀 Come provarlo
-Vai su: [https://digitald.github.io/ear-trainer/](https://digitald.github.io/ear-trainer/)
+## Nuova app (work in progress)
+Per avviare la nuova base:
 
-Oppure clona e apri `index.html` con Live Server.
+```bash
+cd ear-trainer-app
+npm install
+npm run dev
+```
 
----
+Per build e sync Android (senza Android Studio):
 
-## 🧪 In sviluppo
-- Modalità quiz
-- Intervalli discendenti
-- Gamification
+```bash
+npm run build
+npx cap sync android
+```
 
